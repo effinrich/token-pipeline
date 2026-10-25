@@ -3,6 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "main": "./src/main.ts",
+  "exports": {
+    ".": {
+      "types": "./src/main.ts",
+      "import": "./src/main.ts",
+      "default": "./src/main.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "nx": {
     "name": "demo",
     "tags": ["type:app", "scope:tokens"],
