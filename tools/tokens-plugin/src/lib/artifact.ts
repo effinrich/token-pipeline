@@ -5,6 +5,7 @@
  * generator ever reads. Nothing in this file, and nothing in this package,
  * talks to Figma.
  */
+import { resolveCssVarName } from './css-var';
 
 export type TokenType = 'COLOR' | 'FLOAT' | 'STRING' | 'BOOLEAN';
 
@@ -104,5 +105,37 @@ export function assertAliasesMatchTargets(artifact: Artifact): void {
         fail(`token "${token.name}" in mode "${modeName}" is ${actual}, but "${targetName}" is ${expected}`);
       }
     }
+  }
+}
+
+/**
+ * Checks that no two tokens claim the same CSS custom property.
+ *
+ * The CSS anchor comes from the Figma code syntax, and Figma lets two
+ * variables carry the same one. The generator would then emit that custom
+ * property twice in every block, and the later declaration would win
+ * silently - so asking for one token would hand back the other's value.
+ *
+ * Like the alias check, this is a fault in the artifact rather than in the gap
+ * between the artifact and the output: regenerating reproduces it faithfully,
+ * so the byte comparison passes. It has to be checked on its own.
+ */
+export function assertCssAnchorsAreUnique(artifact: Artifact): void {
+  const tokenByAnchor = new Map<string, string>();
+
+  for (const token of artifact.tokens) {
+    const resolved = resolveCssVarName(token.codeSyntax['WEB']);
+    // A missing or malformed code syntax has its own, more specific message.
+    if (!resolved.ok) continue;
+
+    const existing = tokenByAnchor.get(resolved.name);
+    if (existing !== undefined) {
+      fail(
+        `token "${token.name}" uses the CSS custom property "${resolved.name}", which token "${existing}" already uses. ` +
+          'Every token needs its own code syntax in Figma.'
+      );
+    }
+
+    tokenByAnchor.set(resolved.name, token.name);
   }
 }

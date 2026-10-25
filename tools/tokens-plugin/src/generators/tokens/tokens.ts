@@ -14,7 +14,7 @@
  */
 import { joinPathFragments, type Tree } from '@nx/devkit';
 
-import { assertAliasesMatchTargets, parseArtifact } from '../../lib/artifact';
+import { assertAliasesMatchTargets, assertCssAnchorsAreUnique, parseArtifact } from '../../lib/artifact';
 import { buildCss, buildTypeScript, resolveThemes } from '../../lib/render';
 import type { TokensGeneratorSchema } from './schema';
 
@@ -40,7 +40,11 @@ export async function tokensGenerator(tree: Tree, options: TokensGeneratorSchema
 
   if (options.check) {
     // The artifact has to be internally consistent before it can be trusted.
+    // Both of these are faults in the artifact itself, not in the gap between
+    // the artifact and the output, so the byte comparison below cannot see
+    // them.
     assertAliasesMatchTargets(artifact);
+    assertCssAnchorsAreUnique(artifact);
 
     // Then the committed files have to match what the artifact would produce.
     // Regenerating and comparing catches every form of drift at once, which is
