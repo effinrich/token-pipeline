@@ -14,7 +14,12 @@
  */
 import { joinPathFragments, type Tree } from '@nx/devkit';
 
-import { assertAliasesMatchTargets, assertCssAnchorsAreUnique, parseArtifact } from '../../lib/artifact';
+import {
+  assertAliasesMatchTargets,
+  assertCssAnchorsAreUnique,
+  assertTokenNamesAreUnique,
+  parseArtifact,
+} from '../../lib/artifact';
 import { buildCss, buildTypeScript, resolveThemes } from '../../lib/render';
 import type { TokensGeneratorSchema } from './schema';
 
@@ -44,6 +49,7 @@ export async function tokensGenerator(tree: Tree, options: TokensGeneratorSchema
     // the artifact and the output, so the byte comparison below cannot see
     // them.
     assertAliasesMatchTargets(artifact);
+    assertTokenNamesAreUnique(artifact);
     assertCssAnchorsAreUnique(artifact);
 
     // Then the committed files have to match what the artifact would produce.

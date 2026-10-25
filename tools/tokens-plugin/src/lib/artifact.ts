@@ -109,6 +109,37 @@ export function assertAliasesMatchTargets(artifact: Artifact): void {
 }
 
 /**
+ * Checks that every token has a distinct name.
+ *
+ * Figma allows two variables to share a name when they live in different
+ * collections - that is how a second brand or theme is modelled. This
+ * generator reads every local variable and has no way to tell two of them
+ * apart, so the artifact has to be unambiguous.
+ *
+ * Left alone, this would surface as a duplicate key in the generated
+ * TypeScript and a duplicated declaration in the generated CSS, which is a
+ * long way from the mistake. And like the alias check, the byte comparison
+ * cannot see it: regenerating reproduces the clash faithfully.
+ */
+export function assertTokenNamesAreUnique(artifact: Artifact): void {
+  const collectionNameById = new Map(artifact.collections.map((collection) => [collection.id, collection.name]));
+  const seen = new Map<string, string>();
+
+  for (const token of artifact.tokens) {
+    const previousCollection = seen.get(token.name);
+    if (previousCollection !== undefined) {
+      fail(
+        `token "${token.name}" is defined in more than one collection ("${previousCollection}", ` +
+          `"${collectionNameById.get(token.collectionId) ?? token.collectionId}"). ` +
+          'This generator reads every local variable and cannot tell them apart, so each token needs a unique name.'
+      );
+    }
+
+    seen.set(token.name, collectionNameById.get(token.collectionId) ?? token.collectionId);
+  }
+}
+
+/**
  * Checks that no two tokens claim the same CSS custom property.
  *
  * The CSS anchor comes from the Figma code syntax, and Figma lets two
