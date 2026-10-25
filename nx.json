@@ -34,9 +34,6 @@
       "options": {
         "targetName": "lint"
       }
-    },
-    {
-      "plugin": "./tools/tokens-plugin"
     }
   ],
   "targetDefaults": {

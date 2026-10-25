@@ -31,7 +31,6 @@
           "main": "apps/demo/src/main.ts",
           "tsConfig": "apps/demo/tsconfig.app.json",
           "declaration": false,
-          "skipTypeCheck": true,
           "assets": ["apps/demo/src/assets"],
           "esbuildOptions": {
             "sourcemap": true,
