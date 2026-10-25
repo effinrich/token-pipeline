@@ -1,8 +1,16 @@
+# Normalise every text file to LF in the working tree.
+#
+# The machine's global core.autocrlf=true would otherwise check files out with
+# CRLF. That matters twice over here. The generated token files are compared
+# byte-for-byte by the drift guard, so a CRLF checkout makes `tokens:check`
+# fail on a clean tree. And every hand-written file would differ from the
+# archived workspace for no reason other than its line endings.
+* text=auto eol=lf
+
 # The generated token files are compared byte-for-byte by
-# `nx g @tokens/plugin:tokens --check`. The generator emits LF only. With a
-# global core.autocrlf=true, a fresh clone would check these files out with
-# CRLF and the drift guard would fail on a clean tree. Pin them to LF so the
-# check is meaningful in CI and on a fresh clone.
+# `nx g @tokens/plugin:tokens --check`. The generator emits LF only. These are
+# pinned explicitly rather than relying on the global setting, because the
+# drift guard is the one thing in this workspace that compares raw bytes.
 libs/tokens/src/tokens.css text eol=lf
 libs/tokens/src/tokens.generated.ts text eol=lf
 
