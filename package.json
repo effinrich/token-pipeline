@@ -38,5 +38,14 @@
   },
   "dependencies": {
     "@nx/devkit": "23.2.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "nx",
+      "esbuild",
+      "@swc/core",
+      "@parcel/watcher",
+      "unrs-resolver"
+    ]
   }
 }
