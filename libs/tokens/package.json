@@ -1,0 +1,55 @@
+{
+  "name": "@tokens/core",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./tokens.css": "./src/tokens.css",
+    "./package.json": "./package.json"
+  },
+  "nx": {
+    "name": "tokens",
+    "tags": ["type:lib", "scope:tokens"],
+    "targets": {
+      "generate": {
+        "executor": "nx:run-commands",
+        "outputs": ["{projectRoot}/src/tokens.generated.ts", "{projectRoot}/src/tokens.css"],
+        "inputs": [
+          "{workspaceRoot}/tokens/tokens.json",
+          "{projectRoot}/src/tokens.generated.ts",
+          "{projectRoot}/src/tokens.css"
+        ],
+        "options": {
+          "command": "nx g @tokens/plugin:tokens",
+          "cwd": "{workspaceRoot}",
+          "env": {
+            "NX_DAEMON": "false"
+          }
+        }
+      },
+      "check": {
+        "executor": "nx:run-commands",
+        "inputs": [
+          "{workspaceRoot}/tokens/tokens.json",
+          "{projectRoot}/src/tokens.generated.ts",
+          "{projectRoot}/src/tokens.css"
+        ],
+        "options": {
+          "command": "nx g @tokens/plugin:tokens --check",
+          "cwd": "{workspaceRoot}",
+          "env": {
+            "NX_DAEMON": "false"
+          }
+        }
+      }
+    }
+  },
+  "dependencies": {}
+}

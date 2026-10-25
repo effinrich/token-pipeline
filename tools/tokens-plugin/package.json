@@ -1,0 +1,59 @@
+{
+  "name": "@tokens/plugin",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@tokens/workspace": "./src/index.ts",
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "nx": {
+    "name": "tokens-plugin",
+    "tags": ["type:lib", "scope:tokens"],
+    "targets": {
+      "build": {
+        "executor": "@nx/js:tsc",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "options": {
+          "outputPath": "tools/tokens-plugin/dist",
+          "main": "tools/tokens-plugin/src/index.ts",
+          "tsConfig": "tools/tokens-plugin/tsconfig.lib.json",
+          "rootDir": "tools/tokens-plugin/src",
+          "generatePackageJson": false,
+          "assets": [
+            {
+              "input": "./tools/tokens-plugin/src",
+              "glob": "**/!(*.ts)",
+              "output": "."
+            },
+            {
+              "input": "./tools/tokens-plugin/src",
+              "glob": "**/*.d.ts",
+              "output": "."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@nx/devkit": "23.2.1",
+    "tslib": "^2.3.0"
+  },
+  "generators": "./generators.json",
+  "files": [
+    "dist",
+    "!**/*.tsbuildinfo",
+    "generators.json"
+  ]
+}

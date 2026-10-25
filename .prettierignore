@@ -1,0 +1,11 @@
+/dist
+/coverage
+/.nx/cache
+/.nx/workspace-data
+pnpm-lock.yaml
+
+# The token generator owns these bytes. It does not call formatFiles, and the
+# formatter does not touch them either, so a Prettier upgrade can never show up
+# in a token diff.
+libs/tokens/src/tokens.generated.ts
+libs/tokens/src/tokens.css

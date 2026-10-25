@@ -1,0 +1,78 @@
+{
+  "name": "@tokens/demo",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "nx": {
+    "name": "demo",
+    "tags": ["type:app", "scope:tokens"],
+    "targets": {
+      "typecheck": {
+        "dependsOn": ["tokens:check", "^typecheck"]
+      },
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": ["{options.outputPath}"],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "apps/demo/dist",
+          "format": ["cjs"],
+          "bundle": true,
+          "main": "apps/demo/src/main.ts",
+          "tsConfig": "apps/demo/tsconfig.app.json",
+          "assets": ["apps/demo/src/assets"],
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "esbuildOptions": {
+              "sourcemap": false,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        }
+      },
+      "start": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx src/main.ts",
+          "cwd": "{projectRoot}"
+        }
+      },
+      "serve": {
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": ["build"],
+        "options": {
+          "buildTarget": "demo:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "demo:build:development"
+          },
+          "production": {
+            "buildTarget": "demo:build:production"
+          }
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@tokens/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@nx/esbuild": "23.2.1",
+    "esbuild": "0.27.7",
+    "tsx": "^4.20.0"
+  }
+}

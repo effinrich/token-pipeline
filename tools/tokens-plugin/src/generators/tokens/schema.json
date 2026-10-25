@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/schema",
+  "id": "Tokens",
+  "title": "Generate design tokens",
+  "description": "Generate CSS custom properties and TypeScript types from the committed token artifact.",
+  "type": "object",
+  "cli": "nx",
+  "properties": {
+    "artifact": {
+      "type": "string",
+      "description": "Path to the committed token artifact, relative to the workspace root.",
+      "default": "tokens/tokens.json"
+    },
+    "outDir": {
+      "type": "string",
+      "description": "Directory the generated files are written to, relative to the workspace root.",
+      "default": "libs/tokens/src"
+    },
+    "check": {
+      "type": "boolean",
+      "description": "Fail if the committed files differ from what the artifact would generate, instead of writing them.",
+      "default": false
+    }
+  },
+  "additionalProperties": false,
+  "required": []
+}

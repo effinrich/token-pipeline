@@ -1,0 +1,15 @@
+/*
+ * The CSS side of the contract.
+ *
+ * @tokens/core/tokens.css is generated from tokens/tokens.json. The custom
+ * properties below are the only place a token value is written down.
+ */
+@import '@tokens/core/tokens.css';
+
+.card {
+  background: var(--color-bg-surface);
+  color: var(--color-text-default);
+  border: 1px solid var(--color-border-default);
+  padding: var(--space-gutter);
+  border-radius: var(--radius-md);
+}

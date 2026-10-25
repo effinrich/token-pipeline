@@ -1,0 +1,108 @@
+/**
+ * The committed artifact: the contract between Figma and the code.
+ *
+ * The artifact is written by the Figma export step and is the only input the
+ * generator ever reads. Nothing in this file, and nothing in this package,
+ * talks to Figma.
+ */
+
+export type TokenType = 'COLOR' | 'FLOAT' | 'STRING' | 'BOOLEAN';
+
+export interface ArtifactMode {
+  id: string;
+  name: string;
+}
+
+export interface ArtifactCollection {
+  id: string;
+  name: string;
+  defaultModeId: string;
+  modes: ArtifactMode[];
+}
+
+export interface ArtifactToken {
+  name: string;
+  type: TokenType;
+  codeSyntax: Record<string, string | undefined>;
+  collectionId: string;
+  values: Record<string, string>;
+  alias?: Record<string, string>;
+}
+
+export interface Artifact {
+  artifactVersion: number;
+  exportedAt: string;
+  source: { fileName: string; fileKey: string | null; pluginVersion: string };
+  collections: ArtifactCollection[];
+  tokens: ArtifactToken[];
+}
+
+function fail(message: string): never {
+  throw new Error(`[token-generator] ${message}`);
+}
+
+/**
+ * Parses the artifact and rejects anything the generator cannot honour.
+ *
+ * The failures are loud and specific on purpose. A token with no code syntax
+ * is a mistake a designer can fix in Figma, and the message should say so
+ * rather than fail with a stack trace.
+ */
+export function parseArtifact(raw: string): Artifact {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (error) {
+    fail(`the artifact is not valid JSON: ${(error as Error).message}`);
+  }
+
+  if (typeof parsed !== 'object' || parsed === null) {
+    fail('the artifact is not a JSON object');
+  }
+
+  const artifact = parsed as Partial<Artifact>;
+
+  if (artifact.artifactVersion !== 1) {
+    fail(`unsupported artifactVersion ${String(artifact.artifactVersion)} (this generator understands version 1)`);
+  }
+  if (!Array.isArray(artifact.collections) || artifact.collections.length === 0) {
+    fail('the artifact has no collections');
+  }
+  if (!Array.isArray(artifact.tokens) || artifact.tokens.length === 0) {
+    fail('the artifact has no tokens');
+  }
+
+  return artifact as Artifact;
+}
+
+/**
+ * Checks that an aliased token carries the value of the token it points at.
+ *
+ * The Figma plugin resolves aliases before it writes the artifact, so a
+ * mismatch here means the artifact was edited by hand and the two halves no
+ * longer agree. Regenerating would paper over it, so the check refuses.
+ */
+export function assertAliasesMatchTargets(artifact: Artifact): void {
+  const byName = new Map(artifact.tokens.map((token) => [token.name, token]));
+
+  for (const token of artifact.tokens) {
+    if (!token.alias) continue;
+
+    for (const [modeName, targetName] of Object.entries(token.alias)) {
+      const target = byName.get(targetName);
+      if (!target) {
+        fail(`token "${token.name}" aliases "${targetName}", which is not in the artifact`);
+      }
+
+      const expected = target.values[modeName];
+      if (expected === undefined) {
+        fail(`token "${targetName}" has no value for mode "${modeName}"`);
+      }
+
+      const actual = token.values[modeName];
+      if (actual !== expected) {
+        fail(`token "${token.name}" in mode "${modeName}" is ${actual}, but "${targetName}" is ${expected}`);
+      }
+    }
+  }
+}

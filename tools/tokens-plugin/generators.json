@@ -1,0 +1,10 @@
+{
+  "$schema": "../../node_modules/nx/schemas/generators.json",
+  "generators": {
+    "tokens": {
+      "factory": "./src/generators/tokens/tokens",
+      "schema": "./src/generators/tokens/schema.json",
+      "description": "Generate CSS custom properties and TypeScript types from the committed token artifact."
+    }
+  }
+}

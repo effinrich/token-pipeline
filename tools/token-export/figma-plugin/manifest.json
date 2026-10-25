@@ -1,0 +1,13 @@
+{
+  "name": "Token Export",
+  "id": "token-export-local",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "full",
+  "networkAccess": {
+    "allowedDomains": ["none"],
+    "reasoning": "The plugin reads local variables and hands the payload back as text. It never talks to the network."
+  }
+}

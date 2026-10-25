@@ -1,0 +1,37 @@
+{
+  "name": "@tokens/export",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "write": "tsx src/write-artifact.ts"
+  },
+  "nx": {
+    "name": "token-export",
+    "tags": ["type:lib", "scope:tokens"],
+    "targets": {
+      "write": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx src/write-artifact.ts",
+          "cwd": "{projectRoot}"
+        }
+      }
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.20.0"
+  }
+}

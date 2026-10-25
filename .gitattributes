@@ -1,0 +1,11 @@
+# The generated token files are compared byte-for-byte by
+# `nx g @tokens/plugin:tokens --check`. The generator emits LF only. With a
+# global core.autocrlf=true, a fresh clone would check these files out with
+# CRLF and the drift guard would fail on a clean tree. Pin them to LF so the
+# check is meaningful in CI and on a fresh clone.
+libs/tokens/src/tokens.css text eol=lf
+libs/tokens/src/tokens.generated.ts text eol=lf
+
+# The committed artifact is written by the Figma export step, which also
+# emits LF only. Keep the diff stable.
+tokens/tokens.json text eol=lf
