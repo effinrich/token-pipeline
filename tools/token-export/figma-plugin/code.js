@@ -159,7 +159,7 @@ figma.ui.onmessage = async (message) => {
       artifact.tokens.length +
       ' tokens from ' +
       artifact.collections.length +
-      ' collection(s). Copy the JSON, then run: pnpm --filter @tokens/export write';
+      ' collection(s). Copy the JSON, then run: pnpm --filter @tokens/export write --file <path>';
 
     figma.ui.postMessage({ type: 'payload', json: json, summary: summary });
     figma.notify(summary);

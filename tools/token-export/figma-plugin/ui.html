@@ -63,16 +63,16 @@
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(payload.value).then(
             function () {
-              status.textContent = 'Copied. Now run: pnpm --filter @tokens/export write';
+              status.textContent = 'Copied. Now run: pnpm --filter @tokens/export write --file <path>';
             },
             function () {
               document.execCommand('copy');
-              status.textContent = 'Copied. Now run: pnpm --filter @tokens/export write';
+              status.textContent = 'Copied. Now run: pnpm --filter @tokens/export write --file <path>';
             },
           );
         } else {
           document.execCommand('copy');
-          status.textContent = 'Copied. Now run: pnpm --filter @tokens/export write';
+          status.textContent = 'Copied. Now run: pnpm --filter @tokens/export write --file <path>';
         }
       });
 

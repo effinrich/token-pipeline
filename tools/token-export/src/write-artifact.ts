@@ -8,6 +8,9 @@
  *   pnpm --filter @tokens/export write                  # reads stdin
  *   pnpm --filter @tokens/export write --file out.json  # reads a file
  *   pnpm --filter @tokens/export write --out other.json # writes elsewhere
+ *
+ * Relative paths resolve from this package's directory, because pnpm runs a
+ * filtered script with the working directory set to the package.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -34,6 +37,9 @@ function printUsage(): void {
       '  pnpm --filter @tokens/export write                     read the payload from stdin',
       '  pnpm --filter @tokens/export write --file payload.json  read the payload from a file',
       '  pnpm --filter @tokens/export write --out path.json      write somewhere else',
+      '',
+      '  The payload can also be piped straight in:',
+      '    Get-Clipboard -Raw | pnpm --filter @tokens/export write',
     ].join('\n'),
   );
 }
@@ -94,12 +100,32 @@ function assertArtifact(value: unknown): asserts value is { collections: unknown
   }
 }
 
+function readInputFile(path: string): string {
+  const absolute = resolve(process.cwd(), path);
+  try {
+    return readFileSync(absolute, 'utf8');
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code === 'ENOENT') {
+      fail(`no such file: ${absolute}`);
+    }
+    fail(`could not read ${absolute}: ${(error as Error).message}`);
+  }
+}
+
 async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
 
-  const raw = options.inputFile
-    ? readFileSync(resolve(process.cwd(), options.inputFile), 'utf8')
-    : await readStdin();
+  let raw: string;
+  if (options.inputFile) {
+    raw = readInputFile(options.inputFile);
+  } else if (process.stdin.isTTY) {
+    fail(
+      'no payload on stdin. Pipe the JSON in (for example Get-Clipboard -Raw | pnpm --filter @tokens/export write) or pass --file <path>.',
+    );
+  } else {
+    raw = await readStdin();
+  }
 
   if (raw.trim() === '') {
     fail('no payload on stdin. Run the Figma plugin first, or pass --file <path>.');
