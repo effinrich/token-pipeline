@@ -45,7 +45,7 @@ interactive `pnpm approve-builds` step.
 Every project was created by an Nx generator, not by hand:
 
 ```bash
-nx g @nx/workspace:preset                            # workspace root: nx.json, tsconfig.base.json
+create-nx-workspace@23.2.1                            # the workspace itself
 nx g @nx/js:library --name=tokens --directory=libs/tokens --importPath=@tokens/core
 nx g @nx/js:library --name=token-export --directory=tools/token-export --importPath=@tokens/export
 nx g @nx/node:application --name=demo --directory=apps/demo
@@ -57,12 +57,18 @@ Two of those names are easy to get wrong, and both fail loudly rather than
 quietly:
 
 - `nx preset` is **not** a command in Nx 23. It falls through to the target
-  runner and dies with "Both project and target have to be specified". The
-  generator is `nx g @nx/workspace:preset`; `create-nx-workspace` is the CLI
-  wrapper that drives it.
-- `@nx/js:application` **does not exist**. `@nx/js` ships library, node,
-  init, convert-to-swc and a few more. The application generator is
+  runner and dies with "Both project and target have to be specified".
+  `@nx/workspace` does ship a `preset` generator, but it is an *application*
+  generator: it creates an app inside a new workspace, not the workspace
+  itself. The workspace root comes from the `create-nx-workspace` CLI.
+- `@nx/js:application` **does not exist**. `@nx/js` ships library, init,
+  convert-to-swc and a few more. The application generator is
   `@nx/node:application`.
+
+The workspace is created with `create-nx-workspace@23.2.1` rather than
+`create-nx-workspace@latest`, because the latest release creates a newer Nx
+than the one this workspace pins, and an unpinned command will not reproduce
+a pinned workspace.
 
 The consequences are visible in the resolved configuration:
 
