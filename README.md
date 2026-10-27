@@ -195,6 +195,11 @@ this README, produces an empty affected set.
 
 ## Export from Figma
 
+The manifest sets `"documentAccess": "dynamic-page"`, the only value Figma
+documents for that field. The synchronous variable APIs throw under it, so the
+plugin reads variables through the async pair. It reads no page content, so it
+never needs `figma.loadAllPagesAsync()`.
+
 1. In Figma desktop: `Plugins > Development > Import plugin from manifest...`
    and pick `tools/token-export/figma-plugin/manifest.json`.
 2. Run the plugin and press **Export variables**. The JSON appears in the

@@ -10,6 +10,11 @@
  *   figma.variables.getLocalVariablesAsync()
  *   Variable.name, .resolvedType, .valuesByMode, .codeSyntax, .variableCollectionId
  *   VariableCollection.id, .name, .modes, .defaultModeId
+ *
+ * The manifest sets "documentAccess": "dynamic-page", the only value Figma
+ * documents for that field. The synchronous variable APIs throw under it, so
+ * the async pair above is the replacement. The plugin reads no page content,
+ * so it never needs figma.loadAllPagesAsync().
  */
 
 const PLUGIN_VERSION = '0.1.0';
