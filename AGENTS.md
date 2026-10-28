@@ -21,3 +21,22 @@
 - The `nx-generate` skill handles generator discovery internally - don't call nx_docs just to look up generator syntax
 
 <!-- nx configuration end-->
+
+## The export plugin
+
+- **The plugin has a test that runs without Figma.**
+  `pnpm --filter @tokens/export test` loads `figma-plugin/code.js` the way
+  Figma loads it - as a script, with the API on the global object - and drives
+  it with a stub of the two variable APIs. Run it before claiming anything
+  about how the plugin behaves. What it cannot prove is how Figma calls the
+  plugin; that is verified by running the plugin in the desktop app.
+- **A value the plugin cannot read is exported as `null`, never as a string
+  that looks like a value.** A channel that is not a number means the value
+  was never really set. A `#NaNNaNNaN` would pass as a colour to everything
+  that reads the artifact, and the consumer's type check would be the only
+  thing standing between it and the CSS.
+- **A number's unit comes from the variable's scope**, never from its name and
+  never from a hand-written value. Figma stores numbers unitless, so the scope
+  is where the designer says what the number is for: a pixel field makes it a
+  `LENGTH`, an unitless field leaves it a `FLOAT`, and a scope where Figma
+  allows more than one unit is refused rather than guessed at.

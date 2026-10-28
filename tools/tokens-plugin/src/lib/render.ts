@@ -54,14 +54,23 @@ const VALUE_PATTERNS: Record<TokenType, RegExp> = {
   BOOLEAN: /^(true|false)$/,
 };
 
-function checkValue(token: ArtifactToken, modeName: string, value: string): void {
+function checkValue(token: ArtifactToken, modeName: string, value: string | null): string {
   const pattern = VALUE_PATTERNS[token.type];
   if (!pattern) {
     fail(`token "${token.name}" has unknown type "${token.type}"`);
   }
+  // A null value is one the export could not read. It is not a value of any
+  // type, and a STRING would swallow it if it were tested as text.
+  if (value === null) {
+    fail(
+      `token "${token.name}" has no readable value for mode "${modeName}". ` +
+        'The export could not read it, so it is refused by name rather than carried into the CSS.',
+    );
+  }
   if (!pattern.test(value)) {
     fail(`token "${token.name}" has value "${value}" for mode "${modeName}", which is not a valid ${token.type}`);
   }
+  return value;
 }
 
 /**
@@ -133,10 +142,10 @@ function valueFor(token: ArtifactToken, modeName: string): string {
   if (value === undefined) {
     fail(`token "${token.name}" has no value for mode "${modeName}"`);
   }
-  checkValue(token, modeName, value);
+  const checked = checkValue(token, modeName, value);
   // The unit belongs to the type, not to the value. Figma stored a bare
   // number and the scope said this token is a pixel length.
-  return token.type === 'LENGTH' ? `${value}px` : value;
+  return token.type === 'LENGTH' ? `${checked}px` : checked;
 }
 
 function renderBlock(selector: string, declarations: string[]): string {

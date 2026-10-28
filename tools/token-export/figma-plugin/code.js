@@ -25,21 +25,46 @@
 
 const PLUGIN_VERSION = '0.2.0';
 
+/**
+ * A channel that is not a number means the value was never really set.
+ *
+ * The plugin does not invent a hex out of it. A "#NaNNaNNaN" would look like a
+ * colour to everything that reads the artifact, and the consumer's type check
+ * would be the only thing between it and the CSS. The value is exported as
+ * null instead: honest, and the consumer rejects it by name.
+ */
 function toHex(channel) {
+  if (typeof channel !== 'number' || !Number.isFinite(channel)) return null;
   const clamped = Math.max(0, Math.min(1, channel));
   return Math.round(clamped * 255).toString(16).padStart(2, '0');
 }
 
 function colorToHex(rgba) {
-  const base = '#' + toHex(rgba.r) + toHex(rgba.g) + toHex(rgba.b);
-  if (rgba.a === undefined || rgba.a >= 1) return base;
-  return base + toHex(rgba.a);
+  const r = toHex(rgba.r);
+  const g = toHex(rgba.g);
+  const b = toHex(rgba.b);
+  if (r === null || g === null || b === null) return null;
+
+  const base = '#' + r + g + b;
+  if (rgba.a === undefined) return base;
+
+  const a = toHex(rgba.a);
+  if (a === null) return null;
+  if (rgba.a >= 1) return base;
+  return base + a;
 }
 
-/** Figma stores colours as RGBA objects and numbers as unitless floats. */
+/**
+ * Figma stores colours as RGBA objects and numbers as unitless floats.
+ *
+ * A value that cannot be formatted faithfully becomes null rather than a
+ * broken string. The artifact says "there is no value here", and the consumer
+ * refuses the token by name instead of carrying NaN into the CSS.
+ */
 function formatValue(raw) {
-  if (typeof raw === 'number') return String(raw);
-  if (raw !== null && typeof raw === 'object' && typeof raw.r === 'number') return colorToHex(raw);
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw === 'number') return Number.isFinite(raw) ? String(raw) : null;
+  if (typeof raw === 'object') return colorToHex(raw);
   return String(raw);
 }
 

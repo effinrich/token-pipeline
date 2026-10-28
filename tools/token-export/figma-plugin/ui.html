@@ -87,6 +87,11 @@
         }
 
         if (message.type === 'error') {
+          // The payload stays empty on a failure, and Copy JSON is disabled
+          // with it: a designer must not copy the payload of an earlier,
+          // successful export after a later one failed.
+          payload.value = '';
+          copyButton.disabled = true;
           status.textContent = 'Error: ' + message.message;
         }
       });

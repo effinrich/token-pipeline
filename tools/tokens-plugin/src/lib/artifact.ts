@@ -26,7 +26,14 @@ export interface ArtifactToken {
   type: TokenType;
   codeSyntax: Record<string, string | undefined>;
   collectionId: string;
-  values: Record<string, string>;
+  /**
+   * The value in each mode, keyed by mode name.
+   *
+   * A null value means the export could not read that value faithfully - a
+   * channel that is not a number, say. It is refused by name rather than
+   * carried into the CSS.
+   */
+  values: Record<string, string | null>;
   alias?: Record<string, string>;
 }
 
