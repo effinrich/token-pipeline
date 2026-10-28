@@ -240,6 +240,19 @@ Three forms are accepted, and they all mean the same thing:
 
 A variable with no code syntax fails the build with an explicit message.
 
+A **number** variable also needs a **scope**. Figma has no length type: it
+stores every number unitless, and the scope is the designer's statement of
+what the number is for. A number scoped to a pixel field - `GAP`,
+`CORNER_RADIUS`, `WIDTH_HEIGHT`, `FONT_SIZE`, `PARAGRAPH_SPACING`,
+`PARAGRAPH_INDENT`, `STROKE_FLOAT`, `EFFECT_FLOAT` - is a length, and the
+generator renders it with `px`. A number scoped to `OPACITY` or `FONT_WEIGHT`
+stays unitless. The unit comes from the type, so the artifact never carries a
+hand-written `16px`.
+
+A number with no scope, or one scoped to a field where Figma accepts more than
+one unit (`LINE_HEIGHT`, `LETTER_SPACING`), fails the export with an explicit
+message. The pipeline refuses to guess a unit.
+
 ## Layout
 
 ```

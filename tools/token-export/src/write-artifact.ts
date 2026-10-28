@@ -89,8 +89,8 @@ function assertArtifact(value: unknown): asserts value is { collections: unknown
   }
   const artifact = value as { artifactVersion?: unknown; collections?: unknown; tokens?: unknown };
 
-  if (artifact.artifactVersion !== 1) {
-    fail(`unsupported artifactVersion ${String(artifact.artifactVersion)} (expected 1)`);
+  if (artifact.artifactVersion !== 2) {
+    fail(`unsupported artifactVersion ${String(artifact.artifactVersion)} (expected 2)`);
   }
   if (!Array.isArray(artifact.collections) || artifact.collections.length === 0) {
     fail('the payload has no collections');

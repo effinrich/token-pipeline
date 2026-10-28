@@ -7,7 +7,7 @@
  */
 import { resolveCssVarName } from './css-var';
 
-export type TokenType = 'COLOR' | 'FLOAT' | 'STRING' | 'BOOLEAN';
+export type TokenType = 'COLOR' | 'LENGTH' | 'FLOAT' | 'STRING' | 'BOOLEAN';
 
 export interface ArtifactMode {
   id: string;
@@ -63,8 +63,8 @@ export function parseArtifact(raw: string): Artifact {
 
   const artifact = parsed as Partial<Artifact>;
 
-  if (artifact.artifactVersion !== 1) {
-    fail(`unsupported artifactVersion ${String(artifact.artifactVersion)} (this generator understands version 1)`);
+  if (artifact.artifactVersion !== 2) {
+    fail(`unsupported artifactVersion ${String(artifact.artifactVersion)} (this generator understands version 2)`);
   }
   if (!Array.isArray(artifact.collections) || artifact.collections.length === 0) {
     fail('the artifact has no collections');

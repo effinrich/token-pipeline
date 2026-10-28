@@ -30,9 +30,26 @@ function cssVarName(token: ArtifactToken): string {
   return resolved.name;
 }
 
+/**
+ * The artifact's types are the pipeline's, not Figma's.
+ *
+ * Figma has no length type: a number variable is an untyped number, and what
+ * it means depends on the field it is used in. The plugin reads that from the
+ * variable's scope, so by the time an artifact reaches this file the unit is
+ * already decided:
+ *
+ *   LENGTH   a pixel length - the value is a bare number and the unit is added
+ *            here, so the artifact never carries a hand-written "16px".
+ *   FLOAT    a number with no unit - opacity, font weight, a multiplier. The
+ *            value is passed through exactly as Figma stored it.
+ *
+ * A LENGTH written with its unit already in the value is a mistake, and the
+ * pattern below rejects it: "16px" is not a LENGTH, it is a LENGTH twice.
+ */
 const VALUE_PATTERNS: Record<TokenType, RegExp> = {
   COLOR: /^#[0-9a-f]{3,8}$/i,
-  FLOAT: /^-?\d*\.?\d+(px|rem|em|%)?$/,
+  LENGTH: /^-?\d*\.?\d+$/,
+  FLOAT: /^-?\d*\.?\d+$/,
   STRING: /^.*$/s,
   BOOLEAN: /^(true|false)$/,
 };
@@ -117,7 +134,9 @@ function valueFor(token: ArtifactToken, modeName: string): string {
     fail(`token "${token.name}" has no value for mode "${modeName}"`);
   }
   checkValue(token, modeName, value);
-  return value;
+  // The unit belongs to the type, not to the value. Figma stored a bare
+  // number and the scope said this token is a pixel length.
+  return token.type === 'LENGTH' ? `${value}px` : value;
 }
 
 function renderBlock(selector: string, declarations: string[]): string {

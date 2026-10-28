@@ -8,16 +8,22 @@
  * Plugin API surface used here (see the Figma Plugin API reference):
  *   figma.variables.getLocalVariableCollectionsAsync()
  *   figma.variables.getLocalVariablesAsync()
- *   Variable.name, .resolvedType, .valuesByMode, .codeSyntax, .variableCollectionId
+ *   Variable.name, .resolvedType, .valuesByMode, .codeSyntax, .variableCollectionId, .scopes
  *   VariableCollection.id, .name, .modes, .defaultModeId
  *
  * The manifest sets "documentAccess": "dynamic-page", the only value Figma
  * documents for that field. The synchronous variable APIs throw under it, so
  * the async pair above is the replacement. The plugin reads no page content,
  * so it never needs figma.loadAllPagesAsync().
+ *
+ * Artifact version 2. Version 1 carried Figma's own variable types, so a
+ * number was a FLOAT and the pipeline had no way to tell a length from a
+ * unitless number - the unit had to be written into the artifact by hand.
+ * Version 2 carries the pipeline's types instead: a number scoped to a pixel
+ * field is a LENGTH, and a number scoped to an unitless field is a FLOAT.
  */
 
-const PLUGIN_VERSION = '0.1.0';
+const PLUGIN_VERSION = '0.2.0';
 
 function toHex(channel) {
   const clamped = Math.max(0, Math.min(1, channel));
@@ -32,9 +38,58 @@ function colorToHex(rgba) {
 
 /** Figma stores colours as RGBA objects and numbers as unitless floats. */
 function formatValue(raw) {
-  if (typeof raw === 'number') return raw + 'px';
+  if (typeof raw === 'number') return String(raw);
   if (raw !== null && typeof raw === 'object' && typeof raw.r === 'number') return colorToHex(raw);
   return String(raw);
+}
+
+/**
+ * Figma has no length type. A number variable is an untyped number, and what
+ * it means depends on the field it is used in: 16 is sixteen pixels in a gap
+ * and 1.5 is a multiplier in a line height.
+ *
+ * Figma records the designer's decision in the variable's scopes - the fields
+ * the variable is allowed in. That is the only place the unit is declared, so
+ * that is where we read it from. A scope where Figma accepts more than one
+ * unit is refused rather than guessed at, and so is a number with no scope.
+ */
+const PX_SCOPES = new Set([
+  'CORNER_RADIUS',
+  'WIDTH_HEIGHT',
+  'GAP',
+  'FONT_SIZE',
+  'PARAGRAPH_SPACING',
+  'PARAGRAPH_INDENT',
+  'STROKE_FLOAT',
+  'EFFECT_FLOAT',
+]);
+
+const UNITLESS_SCOPES = new Set(['OPACITY', 'FONT_WEIGHT']);
+
+function numberType(variable) {
+  const scopes = variable.scopes || [];
+  const name = variable.name;
+
+  if (scopes.length === 0) {
+    throw new Error(
+      'Variable "' +
+        name +
+        '" is a number with no scope. Figma stores numbers unitless, so the scope is what says whether it is a length. Set the scope in Figma.'
+    );
+  }
+  if (scopes.every((scope) => PX_SCOPES.has(scope))) {
+    return 'LENGTH';
+  }
+  if (scopes.every((scope) => UNITLESS_SCOPES.has(scope))) {
+    return 'FLOAT';
+  }
+  throw new Error(
+    'Variable "' +
+      name +
+      '" is scoped to "' +
+      scopes.join('", "') +
+      '". Figma stores numbers unitless and that scope does not say which unit it is, so the export refuses to guess. Scope it to a pixel field such as GAP or CORNER_RADIUS, or make it a text variable.'
+  );
 }
 
 function isAlias(value) {
@@ -122,7 +177,7 @@ async function buildArtifact() {
 
     const token = {
       name: variable.name,
-      type: variable.resolvedType,
+      type: variable.resolvedType === 'FLOAT' ? numberType(variable) : variable.resolvedType,
       codeSyntax: variable.codeSyntax || {},
       collectionId: collection.id,
       values: values,
@@ -135,7 +190,7 @@ async function buildArtifact() {
   });
 
   return {
-    artifactVersion: 1,
+    artifactVersion: 2,
     exportedAt: new Date().toISOString(),
     source: {
       fileName: figma.root && figma.root.name ? figma.root.name : 'unknown',
