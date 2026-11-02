@@ -113,15 +113,12 @@ names the files:
 Run: nx g @tokens/plugin:tokens
 ```
 
-It also checks that the artifact is internally consistent - an aliased token
-must carry the value of the token it points at - and says exactly which token
-and mode disagree.
-
-The byte comparison subsumes eight of the original nine checks. The ninth,
-alias consistency, is an invariant about the *artifact* rather than about the
-generated files, so it still runs explicitly: regenerating from a
-self-inconsistent artifact would reproduce the inconsistency and the byte
-comparison would happily pass.
+It also checks three invariants about the artifact itself - an aliased token
+must carry the value of the token it points at, token names must be unique,
+and CSS anchors must be unique. These are invariants about the *artifact*
+rather than about the generated files, so they still run explicitly:
+regenerating from a self-inconsistent artifact would reproduce the
+inconsistency and the byte comparison would happily pass.
 
 ## Run it
 

@@ -45,7 +45,7 @@ export async function tokensGenerator(tree: Tree, options: TokensGeneratorSchema
 
   if (options.check) {
     // The artifact has to be internally consistent before it can be trusted.
-    // Both of these are faults in the artifact itself, not in the gap between
+    // All three of these are faults in the artifact itself, not in the gap between
     // the artifact and the output, so the byte comparison below cannot see
     // them.
     assertAliasesMatchTargets(artifact);
