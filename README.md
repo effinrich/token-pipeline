@@ -15,6 +15,10 @@ Figma desktop (Plugin API)
         -> apps/demo  imports @tokens/core
 ```
 
+The full write-up for this workspace, with every command and the reasoning
+behind each decision, is on DEV:
+[Design Tokens as a Compile-Time Contract: Figma Variables to a Typed TypeScript API](https://dev.to/effinrich/design-tokens-as-a-compile-time-contract-figma-variables-to-a-typed-typescript-api-1fnn)
+
 ## Requirements
 
 | Tool                | Version  |
