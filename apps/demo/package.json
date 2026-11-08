@@ -82,7 +82,7 @@
   },
   "devDependencies": {
     "@nx/esbuild": "23.2.1",
-    "esbuild": "0.27.7",
+    "esbuild": "0.28.1",
     "tsx": "^4.20.0"
   }
 }
