@@ -1,4 +1,4 @@
-# Normalise every text file to LF in the working tree.
+# Normalize every text file to LF in the working tree.
 #
 # The machine's global core.autocrlf=true would otherwise check files out with
 # CRLF. That matters twice over here. The generated token files are compared

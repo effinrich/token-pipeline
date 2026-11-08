@@ -29,7 +29,7 @@ const PLUGIN_VERSION = '0.2.0';
  * A channel that is not a number means the value was never really set.
  *
  * The plugin does not invent a hex out of it. A "#NaNNaNNaN" would look like a
- * colour to everything that reads the artifact, and the consumer's type check
+ * color to everything that reads the artifact, and the consumer's type check
  * would be the only thing between it and the CSS. The value is exported as
  * null instead: honest, and the consumer rejects it by name.
  */
@@ -55,7 +55,7 @@ function colorToHex(rgba) {
 }
 
 /**
- * Figma stores colours as RGBA objects and numbers as unitless floats.
+ * Figma stores colors as RGBA objects and numbers as unitless floats.
  *
  * A value that cannot be formatted faithfully becomes null rather than a
  * broken string. The artifact says "there is no value here", and the consumer

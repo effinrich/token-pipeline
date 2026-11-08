@@ -7,7 +7,7 @@
  * refusing an alias that points nowhere - is ordinary code, and ordinary code
  * can be run here.
  *
- * The two API calls are stubbed. That proves the plugin's behaviour, and it
+ * The two API calls are stubbed. That proves the plugin's behavior, and it
  * does not prove that Figma calls the plugin the way the stub does. The
  * hand-off to the desktop app is verified by running the plugin there.
  */
@@ -20,7 +20,7 @@ const PLUGIN_SOURCE = new URL('../figma-plugin/code.js', import.meta.url);
 
 const COLLECTION_ID = 'VariableCollectionId:1:1';
 
-/** A Figma colour: channels between 0 and 1. */
+/** A Figma color: channels between 0 and 1. */
 function color(hex) {
   const value = hex.replace('#', '');
   const channel = (index) => Number.parseInt(value.slice(index, index + 2), 16) / 255;
@@ -233,7 +233,7 @@ test('a number scoped to a pixel field is a LENGTH and carries a bare number', a
   assert.equal(JSON.stringify(artifact).includes('16px'), false);
 });
 
-test('a colour is written as hex', async () => {
+test('a color is written as hex', async () => {
   const { artifact } = await exportVariables(designFile());
   assert.deepEqual(tokenNamed(artifact, 'color/bg/default').values, {
     Light: '#ffffff',

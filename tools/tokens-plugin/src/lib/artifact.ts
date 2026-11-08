@@ -119,7 +119,7 @@ export function assertAliasesMatchTargets(artifact: Artifact): void {
  * Checks that every token has a distinct name.
  *
  * Figma allows two variables to share a name when they live in different
- * collections - that is how a second brand or theme is modelled. This
+ * collections - that is how a second brand or theme is modeled. This
  * generator reads every local variable and has no way to tell two of them
  * apart, so the artifact has to be unambiguous.
  *

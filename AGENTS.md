@@ -32,7 +32,7 @@
   plugin; that is verified by running the plugin in the desktop app.
 - **A value the plugin cannot read is exported as `null`, never as a string
   that looks like a value.** A channel that is not a number means the value
-  was never really set. A `#NaNNaNNaN` would pass as a colour to everything
+  was never really set. A `#NaNNaNNaN` would pass as a color to everything
   that reads the artifact, and the consumer's type check would be the only
   thing standing between it and the CSS.
 - **A number's unit comes from the variable's scope**, never from its name and
